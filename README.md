@@ -1,5 +1,6 @@
 # Cross_Modality_Relevance
 The source code of ACL 2020 paper: "Cross-Modality Relevance for Reasoning on Language and Vision"
+
 Author: Chen Zheng, Quan Guo, Parisa Kordjamshidi
 
 ## data download link

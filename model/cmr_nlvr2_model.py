@@ -7,7 +7,7 @@ from torch.autograd import Variable
 
 import sys
 sys.path.append('../')
-from BERT_related.entry import BertEncoder
+from model.encoder_bert import BertEncoder
 from BERT_related.modeling import GeLU, BertLayerNorm
 
 
