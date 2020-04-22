@@ -136,21 +136,22 @@ class BertEncoder(nn.Module):
 
         return output_lang, output_img, output_cross
 
-    def save(self, path):
-        torch.save(self.model.state_dict(),
-                   os.path.join("tmp_pretrain.pth" % path))
+    # def save(self, path):
+    #     torch.save(self.model.state_dict(),
+    #                os.path.join("tmp_pretrain.pth" % path))
 
-    def load(self, path):
-        print("----------------------------Load pre-trained model from %s" % path)
-        state_dict = torch.load("/home/hlr/shared/data/chenzheng/data/cmr_nlvr2/checkpoints/cmr_pretrain.pth")
-        new_state_dict = {}
-        for key, value in state_dict.items():
-            if key.startswith("module."):
-                new_state_dict[key[len("module."):]] = value
-        state_dict = new_state_dict
+    # def load(self, path):
+    #     print("----------------------------Load pre-trained model from %s" % path)
+    #     # state_dict = torch.load("/home/hlr/shared/data/chenzheng/data/cmr_nlvr2/checkpoints/cmr_pretrain.pth")
+    #     state_dict = torch.load("/tank/space/chen_zheng/data/cmr_nlvr2/checkpoints/cmr_pretrain.pth")
+    #     new_state_dict = {}
+    #     for key, value in state_dict.items():
+    #         if key.startswith("module."):
+    #             new_state_dict[key[len("module."):]] = value
+    #     state_dict = new_state_dict
 
-        # Load weights to model
-        self.model.load_state_dict(state_dict, strict=False)
+    #     # Load weights to model
+    #     self.model.load_state_dict(state_dict, strict=False)
 
 
 

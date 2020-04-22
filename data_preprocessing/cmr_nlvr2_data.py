@@ -11,7 +11,8 @@ from configs.global_config import GLOBAL_CONFIG
 
 class NLVR2Dataset:
     def __init__(self, data_loc: str):
-
+        self.name = data_loc
+        
         # Loading datasets to data
         self.data = []
         self.data.extend(json.load(open(data_loc)))
@@ -32,9 +33,13 @@ class NLVR2TorchDataset(Dataset):
         cfg = GLOBAL_CONFIG()
         # Loading detection features to img_data
         img_data = []
-        img_data.extend(load_obj_tsv(cfg.train_img_feat, topk=-1))
-        img_data.extend(load_obj_tsv(cfg.valid_img_feat, topk=-1))
-        img_data.extend(load_obj_tsv(cfg.test_img_feat, topk=-1))
+
+        if 'train' in dataset.name:
+            img_data.extend(load_obj_tsv(cfg.train_img_feat, topk=-1))
+        if 'valid' in dataset.name:
+            img_data.extend(load_obj_tsv(cfg.valid_img_feat, topk=-1))
+        if 'test' in dataset.name:
+            img_data.extend(load_obj_tsv(cfg.test_img_feat, topk=-1))
 
         self.imgid2img = {}
         for img_datum in img_data:
@@ -44,7 +49,7 @@ class NLVR2TorchDataset(Dataset):
         for datum in self.raw_dataset.data:
             if datum['img0'] in self.imgid2img and datum['img1'] in self.imgid2img:
                 self.data.append(datum)
-        print("Use %d data in torch dataset" % (len(self.data)))
+        print("Use %d data in torch dataset! CMR tips: some pictures' links cannot found, so those samples can not use!" % (len(self.data)))
         print()
 
     def __len__(self):

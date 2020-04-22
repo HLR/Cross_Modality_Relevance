@@ -11,6 +11,10 @@ Author: Chen Zheng, Quan Guo, Parisa Kordjamshidi
 ```
 ```
 
+## Tips
+>- The image feature files are very large, espeically the training_img_feature file has around 40GB.
+>- Make sure both CPU and GPU memory are enough to load the data and model.
+
 ## experiment environment:
 >- Machine: Lambda GPU machine.
 >- GPU: TITAN RTX.

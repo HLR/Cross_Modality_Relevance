@@ -10,6 +10,7 @@ venv/
 
 # tmp 
 best_replace_sum_to_cat_and_baylayer_to_a_lot_of_re8/
+load_model/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

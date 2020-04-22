@@ -24,7 +24,8 @@ class CMR:
         if cfg.valid != "":
             valid_bsize = 2048 if cfg.multiGPU else 512
             self.valid_tuple = get_tuple(
-                cfg.valid, bs=valid_bsize,
+                # cfg.valid, bs=valid_bsize,
+                cfg.valid, bs=cfg.batch_size,
                 shuffle=False, drop_last=False
             )
         else:
@@ -33,7 +34,7 @@ class CMR:
         self.model = Cross_Modality_Relevance(cfg)
 
         if cfg.load_cmr is not None:
-            self.model.bert_encoder.load(cfg.load_cmr)
+            self.model.load_state_dict(torch.load(cfg.load_cmr))
 
         if cfg.multiGPU:
             self.model.bert_encoder.multi_gpu()
@@ -50,6 +51,7 @@ class CMR:
                                   t_total=t_total)
         else:
             self.optim = cfg.optimizer(list(self.model.parameters()), cfg.lr)
+        # self.optim = BertAdam(list(self.model.parameters()), lr=cfg.lr, warmup=0.1,)
 
         self.output = cfg.output
         os.makedirs(self.output, exist_ok=True)
@@ -100,12 +102,9 @@ class CMR:
     def predict(self, eval_tuple: DataTuple, dump=None):
         self.model.eval()
         dset, loader, evaluator = eval_tuple
+        iter_wrapper = (lambda x: tqdm(x, total=len(loader))) if cfg.tqdm else (lambda x: x)
         quesid2ans = {}
-        for i, datum_tuple in enumerate(loader):
-            ques_id, feats, boxes, sent = datum_tuple[:4]   # avoid handling target
-            # print(ques_id, feats, boxes, sent)
-            # import sys
-            # sys.exit()
+        for i, (ques_id, feats, boxes, sent, label) in iter_wrapper(enumerate(loader)):
             with torch.no_grad():
                 feats, boxes = feats.cuda(), boxes.cuda()
                 logit = self.model(feats, boxes, sent)
@@ -127,9 +126,8 @@ class CMR:
 
     def load(self, path):
         print("Load model from %s" % path)
-        state_dict = torch.load("%s.pth" % path)
+        state_dict = torch.load("%s" % path)
         self.model.load_state_dict(state_dict)
-
 
 
 def get_tuple(splits: str, bs:int, shuffle=False, drop_last=False) -> DataTuple:
@@ -157,42 +155,16 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available()
                           and not cfg.no_cuda else "cpu")
 
-    # device = torch.device("cuda:1")
-
     n_gpu = torch.cuda.device_count()
-    # n_gpu = 1
-    print('------------------------------------->:' , device, n_gpu)
+    print('number of the gpu devices------------------------------------->:' , device, n_gpu)
 
+    #### initial the model
     nlvr2 = CMR(cfg)
 
-    if cfg.load_cmr is not None:
-        nlvr2.load(cfg.load_cmr)
-
-    # Test or Train
-    if cfg.test is not None:
-        cfg.fast = cfg.tiny = False       # Always loading all data in test
-        if 'hidden' in cfg.test:
-            nlvr2.predict(
-                get_tuple(cfg.test, bs=cfg.batch_size,
-                          shuffle=False, drop_last=False),
-                dump=os.path.join(cfg.output, 'hidden_predict.csv')
-            )
-        elif 'test' in cfg.test or 'valid' in cfg.test:
-            result = nlvr2.evaluate(
-                get_tuple(cfg.test, bs=cfg.batch_size,
-                          shuffle=False, drop_last=False),
-                dump=os.path.join(cfg.output, '%s_predict.csv' % cfg.test)
-            )
-            print(result)
-        else:
-            assert False, "No such test option for %s" % cfg.test
+    # Train 
+    print('CMR: Load Train data!')
+    if nlvr2.valid_tuple is not None:
+        print('CMR: Load Valid data!')
     else:
-        print('Load Train data!')
-        if nlvr2.valid_tuple is not None:
-            print('Load Valid data!')
-        else:
-            print("DO NOT USE VALIDATION")
-        nlvr2.train(nlvr2.train_tuple, nlvr2.valid_tuple)
-
-
-
+        print("CMR: No valid data, only train data!")
+    nlvr2.train(nlvr2.train_tuple, nlvr2.valid_tuple)
