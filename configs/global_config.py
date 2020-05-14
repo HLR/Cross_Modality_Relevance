@@ -6,8 +6,6 @@ class GLOBAL_CONFIG(object):
         self.train = '/tank/space/chen_zheng/data/cmr_nlvr2/data/nlvr2_preprocessing_data/train.json'
         self.valid = '/tank/space/chen_zheng/data/cmr_nlvr2/data/nlvr2_preprocessing_data/valid.json'
         self.test = '/tank/space/chen_zheng/data/cmr_nlvr2/data/nlvr2_preprocessing_data/test.json'
-        # self.valid = None
-        # self.test = None
 
         ###### img feat location
         self.train_img_feat = '/tank/space/chen_zheng/data/cmr_nlvr2/data/nlvr2_imgfeat/train_obj36.tsv'
