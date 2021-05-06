@@ -32,6 +32,10 @@ https://drive.google.com/file/d/10SBGpAXQ-tV0qpEjlxatyWYbwND5u0Hd/view?usp=shari
 >- Machine: Lambda GPU machine.
 >- GPU: TITAN RTX.
 
+## Load conda environment:
+>- conda env create -f cmr.yaml
+>- source activate cmr
+
 ## How to run the code?
 >- before runing the code, please make sure your config file is correct: configs/global_config.py
 ```python
